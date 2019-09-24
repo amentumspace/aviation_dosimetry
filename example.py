@@ -14,11 +14,22 @@ model_doses = [3, 4, 5, 6]
 
 df = pd.read_csv("experiment.csv", skiprows=1, header=none)
 
-#TODO specify the latitude, longitude, date of the experimnt
+#TODO overwrite the column titles
+df.columns = ["time", "altitude", "dose"]
 
-#TODO for each altiude in the list
+#TODO specify the latitude, longitude, date of the experimnt
+#TODO create a dictionary to store the parameters
+latitude = 20 # [-90, 90] degrees N is +ve
+longitude = 120 # [-180, 180] degrees
+year = '2019'
+month = '3'
+day = '23'
 
 #TODO requestrequest model prediction from API at same conditions
+for alt in df['altitudes'] :
+    #TODO add the altitude to the dictionary
+
+    #TODO request model prediction from API at same conditions
 
 #create plot of experimental and model predicted doses vs aaltitude
 
