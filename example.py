@@ -18,13 +18,13 @@ df = pd.read_csv("experiment.csv", skiprows=1, header=None)
 #TODO overwrite the column titles
 df.columns = ["time", "altitude", "dose"]
 
-#TODO specify the latitude, longitude, date of the experimnt
+#TODO double check the latitude, longitude, date of the experimnt
 #TODO create a dictionary to store the parameters
-latitude = 20 # [-90, 90] degrees N is +ve
-longitude = 120 # [-180, 180] degrees
-year = '2019'
-month = '3'
-day = '23'
+latitude = 33.51 S # [-90, 90] degrees N is +ve
+longitude = 147.24 E # [-180, 180] degrees
+year = '2015'
+month = '7'
+day = '19'
 
 #TODO requestrequest model prediction from API at same conditions
 for alt in df['altitude'] :
