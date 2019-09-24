@@ -5,10 +5,11 @@ import pandas as pd
 # define toy data for altitudes and doses #
 
 altitudes = [0, 500, 1000, 1500] #metres
-doses = [0, 7, 21, 28]
+doses = [0, 7, 21, 28] #uSvS
 
 # TODO do the same for model data
 model_doses = [3, 4, 5, 6]
+model_altitudes = [3, 4, 5, 6]
 
 # TODO import experimental data from csv file
 
@@ -26,9 +27,9 @@ month = '3'
 day = '23'
 
 #TODO requestrequest model prediction from API at same conditions
-for alt in df['altitudes'] :
+for alt in df['altitude'] :
     #TODO add the altitude to the dictionary
-
+    pass
     #TODO request model prediction from API at same conditions
 
 #create plot of experimental and model predicted doses vs aaltitude
