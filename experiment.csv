@@ -1,2 +1,5 @@
 #time, seconds altitudes, metres dose, sieverts
-0
+0, 500, 1.2
+2, 1000, 3.3
+3, 1500, 4.5
+5, 2000, 7.9
