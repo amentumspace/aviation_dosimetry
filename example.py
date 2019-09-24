@@ -12,7 +12,7 @@ model_doses = [3, 4, 5, 6]
 
 # TODO import experimental data from csv file
 
-df = pd.read_csv("experiment.csv", skiprows=1, header=none)
+df = pd.read_csv("experiment.csv", skiprows=1, header=None)
 
 #TODO overwrite the column titles
 df.columns = ["time", "altitude", "dose"]
