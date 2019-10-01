@@ -20,8 +20,8 @@ df.columns = ["time", "altitude", "dose"]
 
 #TODO double check the latitude, longitude, date of the experimnt
 #TODO create a dictionary to store the parameters
-latitude = -33.51 (S) # [-90, 90] degrees N is +ve
-longitude = 147.24 (E) # [-180, 180] degrees E is +ve
+latitude = -33.51 #(S)  [-90, 90] degrees N is +ve
+longitude = 147.24 #(E)  [-180, 180] degrees E is +ve
 year = '2015'
 month = '7'
 day = '19'
