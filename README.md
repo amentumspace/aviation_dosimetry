@@ -4,7 +4,8 @@
 
 Everyday cosmic radiation enters the Earth's atmosphere, significant amount of this radiation is made up of gamma rays. 
 
-This validation study will be comparing data modeled from the Amentum API with data gathered in Western Australia in a University of Sydney study. (Possibly also a California study, not sure yet).
+This validation study will be comparing data modeled from the Amentum APIs, PARMA and CARI7,  with data gathered in Western Australia in a University of Sydney study. 
+
 This study will validate the API's ability to model gamma radiation in Earth's atmosphere.
 
 ## Aim
@@ -22,9 +23,8 @@ Run the analysis script by entering the following in a terminal
 Include the main result image here
 
 #First draft
-#Might be adding the California study
-The difference between data gathered from the API and data gathered from the Sdney uni experiment are orders of magnitude different. A logarmithmic y axis was used so the results plotted in a nicer looking way.
-Though the Regener-Pfotzer Maximum can be seen in both sets of data. This
+The difference between data gathered from the PARMA API and data gathered from the Sdney uni experiment are orders of magnitude different. A logarmithmic y axis was used so the results plotted in a nicer looking way.
+Though the Regener-Pfotzer Maximum can be seen in both sets of data. This indicates that there is some reliability in each method.
 
 ## Acknowledgement
 
