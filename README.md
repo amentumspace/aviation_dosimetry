@@ -26,6 +26,10 @@ Include the main result image here
 The difference between data gathered from the PARMA API and data gathered from the Sdney uni experiment are orders of magnitude different. A logarmithmic y axis was used so the results plotted in a nicer looking way.
 Though the Regener-Pfotzer Maximum can be seen in both sets of data. This indicates that there is some reliability in each method.
 
+![](lineplot.png)
+![](barplot.png)
+
+
 ## Acknowledgement
 
 Write details for the publication here 

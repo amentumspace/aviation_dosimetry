@@ -79,6 +79,6 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 
-plt.show()
+#plt.show()
 
-plt.savefig("barplot")
+plt.savefig("barplot.png")

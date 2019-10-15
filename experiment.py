@@ -74,6 +74,6 @@ axes.set_xlabel("Time, s")
 axes.set_ylabel("Doses, uSv")
 
 plt.legend(loc="upper left")
-plt.show()
+#plt.show()
 
-plt.savefig("lineplot")
+plt.savefig("lineplot.png")
