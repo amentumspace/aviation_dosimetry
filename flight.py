@@ -58,12 +58,6 @@ for model in ["parma", "cari7"]:
 
 
 
-
-#row1["hawka"]
-#row1["liu"]
-#row1["tepc"]
-#row1["epc"]
-
 labels = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']
 
 x = np.arange(df.shape[0])
@@ -79,10 +73,12 @@ rects3 = ax.bar(x + width/2, df["epc"], width, label='EPCARD')
 rects3 = ax.bar(x + width * 1.5, df["cari7"], width, label='CARI-7')
 rects3 = ax.bar(x + width * 2.5, df["parma"], width, label='PARMA')
 
-# Add some text for labels, title and custom x-axis tick labels, etc.
+
 ax.set_ylabel('Ambient dose equivalent, uSv/hr')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 
 plt.show()
+
+plt.savefig("barplot")

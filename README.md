@@ -4,7 +4,7 @@
 
 Everyday cosmic radiation enters the Earth's atmosphere, significant amount of this radiation is made up of gamma rays. 
 
-This validation study will be comparing data modeled from the Amentum APIs, PARMA and CARI7,  with data gathered in Western Australia in a University of Sydney study. 
+This validation study will be does two comparisons, using PARMA and CARI-7 APIs. The first compares the APIs with data gathered from (a European study), and the seond with a University of Sydney study. 
 
 This study will validate the API's ability to model gamma radiation in Earth's atmosphere.
 
