@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import requests
 
-url = "http://cosmicrays.amentum.space"
-
 df = pd.read_csv("experiment.csv", skiprows=1, header=None)
 
 #TODO overwrite the column titles
@@ -16,7 +14,7 @@ month = '7'
 day = '19'
 
 def get_api_data(particle, api): #This line sets the following formula so we can later change the particle
-    url = "http://cosmicrays.amentum.space/" + api + "effective_dose"
+    url = "http://cosmicrays.amentum.space/" + api + "/effective_dose"
     values = [] #This stores the values calulated from the API
     for alt in df['altitude'] :
         #TODO add the altitude to the dictionary
@@ -27,17 +25,20 @@ def get_api_data(particle, api): #This line sets the following formula so we can
             "year" : 2015,
             "month" : 7,
             "day" : 19,
+            "utc" : 10,
             "particle" : particle
             }
-
+        if particle == "gamma" and api == "cari7":
+            parameters["particle"] = "photon"
         response = requests.get(url, params=parameters) 
 
         dose_rate = response.json() 
 
+
         dose_rate_val = dose_rate['dose rate']['value']
 
         values.append(dose_rate_val) 
-        return values
+    return values
 
 #create plot of experimental and model predicted doses vs altitude
 
@@ -45,35 +46,35 @@ fig = plt.figure()
 
 axes = fig.add_subplot(111)
 
-axes.semilogy(
+axes.plot(
     df['time'], df['dose'], 
-    label="exp", linestyle="None", marker="+")
+    label="Experiment", linestyle="None", marker="x")
 #axes.plot(df['altitude'], df['dose'], label="model")
 
 values = get_api_data("gamma", "parma")
-axes.semilogy(
+axes.plot(
     df['time'], values, 
-    label="API_g", linestyle="None", marker="+", color="red")
+    label="PARMA_g", linestyle="None", marker="x", color="red")
 
 values = get_api_data("total", "parma")
-axes.semilogy(
+axes.plot(
     df['time'], values, 
-    label="API_t", linestyle="None", marker="+", color="red")
+    label="PARMA_t", linestyle="None", marker="+", color="red")
 
 values = get_api_data("gamma", "cari7")
-axes.semilogy(
+axes.plot(
     df['time'], values, 
-    label="API_g", linestyle="None", marker="x", color="blue")
+    label="CARI-7_g", linestyle="None", marker="x", color="blue")
 
 values = get_api_data("total", "cari7")
-axes.semilogy(
+axes.plot(
     df['time'], values, 
-    label="API_t", linestyle="None", marker="x", color="blue")
+    label="CARI-7_t", linestyle="None", marker="+", color="blue")
 
 axes.set_xlim(left=0)
 axes.set_ylim(bottom=0)
 axes.set_xlabel("Time, s")
 axes.set_ylabel("Doses, uSv")
 
-plt.legend(loc="lower left")
+plt.legend(loc="upper left")
 plt.show()

@@ -4,59 +4,85 @@ from pint import UnitRegistry
 import numpy as np
 import requests
 
+ureg = UnitRegistry()
 df = pd.read_csv("flight_data.csv")
 
-url = "http://cosmicrays.amentum.space/cari7/effective_dose"
 
 df.columns = [
     "altitude",
     "lat",
     "long",
     "hawka",
-    "hawka_er",
+    "hawkaerr",
     "hawki",
-    "hawki_er",
+    "hawkierr",
     "liu",
-    "liu_er",
+    "liuerr",
     "tepc",
-    "tepc_er",
+    "tepcerr",
     "ami",
     "siev",
-    "siev_er",
+    "sieverr",
     "epc"
     ]
 
-row1 = df.iloc[0]
+for model in ["parma", "cari7"]:
+    url = "http://cosmicrays.amentum.space/" + model + "/effective_dose"
+    values = []
 
-values = []
+    for index, row in df.iterrows():
+        alt = row["altitude"] * ureg.foot
+        alt = alt.to(ureg.kilometer).magnitude
+        lat = row["lat"]
+        lon = row["long"]
 
-for index, row in df.iterrows():
-    alt =  2 #df["altitude"]
-    lat = row["lat"]
-    lon = row["long"]
+        parameters = {
+            "altitude" : alt, #km 
+            "latitude" : lat, #degrees (N)
+            "longitude" : lon, #degrees (E)
+            "year" : 2003,
+            "month" : 5,
+            "day" : 6,
+            "utc" : 12,
+            "particle" : "total"
+        }
+        response = requests.get(url, params=parameters) 
 
-    parameters = {
-        "altitude" : alt, #km 
-        "latitude" : lat, #degrees (N)
-        "longitude" : lon, #degrees (E)
-        "year" : 2003,
-        "month" : 5,
-        "day" : 6,
-        "utc" : 12,
-        "particle" : "total"
-    }
-    response = requests.get(url, params=parameters) 
+        dose_rate = response.json() 
 
-    dose_rate = response.json() 
+        dose_rate_val = dose_rate['dose rate']['value']
 
-    dose_rate_val = dose_rate['dose rate']['value']
+        values.append(dose_rate_val) 
 
-    values.append(dose_rate_val) 
+    df[model] = values
 
 
 
 
-row1["hawka"]
-row1["liu"]
-row1["tepc"]
-row1["epc"]
+#row1["hawka"]
+#row1["liu"]
+#row1["tepc"]
+#row1["epc"]
+
+labels = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']
+
+x = np.arange(df.shape[0])
+
+width = 0.1  # the width of the bars
+
+fig, ax = plt.subplots()
+
+rects1 = ax.bar(x - width * 2.5, df["hawka"], width, label='HAWKarcs', yerr=df["hawkaerr"])
+rects1 = ax.bar(x - width * 1.5, df["liu"], width, label='Liulin', yerr=df["liuerr"])
+rects2 = ax.bar(x - width/2, df["tepc"], width, label='TEPC', yerr=df["tepcerr"])
+rects3 = ax.bar(x + width/2, df["epc"], width, label='EPCARD')
+rects3 = ax.bar(x + width * 1.5, df["cari7"], width, label='CARI-7')
+rects3 = ax.bar(x + width * 2.5, df["parma"], width, label='PARMA')
+
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel('Ambient dose equivalent, uSv/hr')
+ax.set_xticks(x)
+ax.set_xticklabels(labels)
+ax.legend()
+
+plt.show()
