@@ -28,14 +28,12 @@ We can see that European study and the API results are close to the experimental
 The results from the USyd study do not agree with the data gained from the API models.
 
 ![](barplot.png)
-***
 |The bars are broken into groups of when the readings were taken.|
 |---|
 |G1: Altitude = 40,000 ft; Latitude = 57 N; Longitude 8 E|
 |G2: Altitude = 32,000 ft; Latitude = 57 N; Longitude 8 E|
 |G3: Altitude = 40,000 ft; Latitude = 42 N; Longitude 12 E|
 |G4: Altitude = 32,000 ft; Latitude = 42 N; Longitude 12 E|
-***
 
 
 ![](lineplot.png)
