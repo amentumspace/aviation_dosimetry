@@ -13,7 +13,7 @@ month = '7'
 day = '19'
 
 def get_api_data(particle, api): 
-    url = "http://cosmicrays.amentum.space/" + api + "/effective_dose"
+    url = "http://cosmicrays.amentum.space/" + api + "/ambient_dose"
     values = [] 
     for alt in df['altitude'] :
         

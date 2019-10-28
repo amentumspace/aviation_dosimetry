@@ -27,7 +27,7 @@ df.columns = [
     ]
 
 for model in ["parma", "cari7"]:
-    url = "http://cosmicrays.amentum.space/" + model + "/effective_dose"
+    url = "http://cosmicrays.amentum.space/" + model + "/ambient_dose"
     values = []
 
     for index, row in df.iterrows():
