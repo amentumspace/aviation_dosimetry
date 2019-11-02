@@ -1,79 +1,105 @@
+from datetime import datetime
+from datetime import timedelta
 import matplotlib.pyplot as plt
+import numpy as np 
 import pandas as pd
+import pytz
 import requests
 
 df = pd.read_csv("experiment.csv", skiprows=1, header=None)
-
 df.columns = ["time", "dose", "altitude"]
 
-latitude = -33.51 #(S)  [-90, 90] degrees N is +ve
-longitude = 147.24 #(E)  [-180, 180] degrees E is +ve
-year = '2015'
-month = '7'
-day = '19'
+# West Wyalong NSW Australia
+latitude = -33.98 #(S)  [-90, 90] degrees N is +ve
+longitude = 147.3 #(E)  [-180, 180] degrees E is +ve
 
-def get_api_data(particle, api): 
+# create a datetime object with launch start time 09:15 AEST 19th July 2019
+dt = datetime(2015,7,19, 9, 15, tzinfo=pytz.timezone('Australia/Sydney'))      
+# convert to Universal coordinated time (UTC)
+dt = dt.astimezone(pytz.utc)      
+# new column with UTC time of each measurement
+df['datetime'] = df['time'].apply(lambda x : timedelta(seconds=x) + dt)
+# set the time as the index to make plotting simpler
+df.set_index('time', inplace=True)   
+
+def get_api_data(row, particle, api):
+    """
+    Make an API call for selected API and particle
+
+    Args: row of pandas dataframe, name of api, name of particle
+
+    """ 
     url = "http://cosmicrays.amentum.space/" + api + "/ambient_dose"
-    values = [] 
-    for alt in df['altitude'] :
-        
-        parameters = {
-            "altitude" : alt, #km 
-            "latitude" : -33.51, #degrees (N)
-            "longitude" : 147.24, #degrees (E)
-            "year" : 2015,
-            "month" : 7,
-            "day" : 19,
-            "utc" : 10,
-            "particle" : particle
-            }
-        if particle == "gamma" and api == "cari7":
-            parameters["particle"] = "photon"
+    
+    parameters = {
+        "altitude" : row.altitude, #km 
+        "latitude" : latitude, #degrees (N)
+        "longitude" : longitude, #degrees (E)
+        "year" : row.datetime.year, # access using datetime object in row index
+        "month" : row.datetime.month,
+        "day" : row.datetime.day,
+        "utc" : row.datetime.hour, 
+        "particle" : particle
+    }
+
+    # account for different naming convention in cari7 api
+    if particle == "gamma" and api == "cari7":
+        parameters["particle"] = "photon"
+    
+    # make the call and handle errors
+    try:
         response = requests.get(url, params=parameters) 
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e: 
+        print("HTTP error", e)
+    except requests.exceptions.RequestException as e: 
+        print("Request error", e)
 
-        dose_rate = response.json() 
+    # retrieve and return the dose rate
+    dose_rate = response.json() 
+    dose_rate_val = dose_rate['dose rate']['value']
+    return dose_rate_val
+
+# Create new columns by calling API endpoints for gammas and total ambient dose equivalents
+df['parma gamma'] = df.apply(get_api_data, args=("gamma", "parma"), axis=1)
+df['parma total'] = df.apply(get_api_data, args=("total", "parma"), axis=1)
+df['cari7 gamma'] = df.apply(get_api_data, args=("gamma", "cari7"), axis=1)
+df['cari7 total'] = df.apply(get_api_data, args=("total", "cari7"), axis=1)
+
+for plot_total in [True, False]:
+    # create a plot of just gamma dose, another with total doses on log y plot
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111)
+    
+    df['dose'].plot(
+        label="Experiment", linestyle="-", drawstyle="steps-post", 
+        color="Black", logy=plot_total)
+    df['parma gamma'].plot(
+        label="PARMA gamma", linestyle="None", marker="s", 
+        color="DodgerBlue", logy=plot_total)
+    df['cari7 gamma'].plot(
+        label="CARI7 gamma", linestyle="None", marker="o", 
+        color="OrangeRed", logy=plot_total)
+    
+    # only plot totals on second graph
+    if plot_total: 
+        df['parma total'].plot(
+            label="PARMA total", linestyle="None", marker="s", 
+            fillstyle='none', color="DodgerBlue", logy=True)
+        df['cari7 total'].plot(
+            label="CARI7 total", linestyle="None", marker="o", 
+            fillstyle='none',  color="OrangeRed", logy=True)
+
+    axes.set_xlim(left=0)
+    axes.set_ylim(bottom=0)
+    axes.set_xlabel("Time, s")
+    axes.set_ylabel("Ambient Dose Equivalent, uSv/hr")
+
+    plt.legend(loc="upper left")
+
+    filename = "lineplot"
+    if plot_total : filename += "_totals"
+    plt.savefig(filename+".png")
 
 
-        dose_rate_val = dose_rate['dose rate']['value']
-
-        values.append(dose_rate_val) 
-    return values
-
-
-fig = plt.figure()
-
-axes = fig.add_subplot(111)
-
-axes.plot(
-    df['time'], df['dose'], 
-    label="Experiment", linestyle="None", marker="x")
-
-values = get_api_data("gamma", "parma")
-axes.plot(
-    df['time'], values, 
-    label="PARMA_g", linestyle="None", marker="x", color="red")
-
-values = get_api_data("total", "parma")
-axes.plot(
-    df['time'], values, 
-    label="PARMA_t", linestyle="None", marker="+", color="red")
-
-values = get_api_data("gamma", "cari7")
-axes.plot(
-    df['time'], values, 
-    label="CARI-7_g", linestyle="None", marker="x", color="blue")
-
-values = get_api_data("total", "cari7")
-axes.plot(
-    df['time'], values, 
-    label="CARI-7_t", linestyle="None", marker="+", color="blue")
-
-axes.set_xlim(left=0)
-axes.set_ylim(bottom=0)
-axes.set_xlabel("Time, s")
-axes.set_ylabel("Doses, uSv")
-
-plt.legend(loc="upper left")
-#plt.show()
-
-plt.savefig("lineplot.png")
