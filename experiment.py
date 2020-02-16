@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np 
+import os
 import pandas as pd
 import pytz
 import requests
@@ -21,6 +22,8 @@ dt = dt.astimezone(pytz.utc)
 df['datetime'] = df['time'].apply(lambda x : timedelta(seconds=x) + dt)
 # set the time as the index to make plotting simpler
 df.set_index('time', inplace=True)   
+# convert to decimal hours for plotting
+df.index /= 3600
 
 def get_api_data(row, particle, api):
     """
@@ -29,7 +32,14 @@ def get_api_data(row, particle, api):
     Args: row of pandas dataframe, name of api, name of particle
 
     """ 
-    url = "http://cosmicrays.amentum.space/" + api + "/ambient_dose"
+    # check env variable to over-ride 
+    url = "http://cosmicrays.amentum.space/" 
+
+    if os.environ.get('URL') is not None:
+         url = os.environ.get('URL')
+
+    url += api 
+    url += "/ambient_dose"
     
     parameters = {
         "altitude" : row.altitude, #km 
@@ -76,10 +86,10 @@ for plot_total in [True, False]:
         label="Experiment", linestyle="-", drawstyle="steps-post", 
         color="Black", logy=plot_total)
     df['parma gamma'].plot(
-        label="PARMA gamma", linestyle="None", marker="s", 
+        label="PARMA", linestyle="None", marker="s", 
         color="DodgerBlue", logy=plot_total)
     df['cari7 gamma'].plot(
-        label="CARI7 gamma", linestyle="None", marker="o", 
+        label="CARI7", linestyle="None", marker="o", 
         color="OrangeRed", logy=plot_total)
     
     # only plot totals on second graph
@@ -93,10 +103,15 @@ for plot_total in [True, False]:
 
     axes.set_xlim(left=0)
     axes.set_ylim(bottom=0)
-    axes.set_xlabel("Time, s")
-    axes.set_ylabel("Ambient Dose Equivalent, uSv/hr")
+    axes.set_xlabel("Duration, hr")
+    axes.set_ylabel("Ambient Dose Equivalent (gamma), uSv/hr")
 
     plt.legend(loc="upper left")
+
+    ax2 = axes.twinx()
+    ax2.set_ylim(bottom=0, top=df.altitude.max()*1.2)
+    df.altitude.plot(linestyle=":", logy=plot_total, color="Grey")
+    ax2.set_ylabel("Altitude, km")
 
     filename = "lineplot"
     if plot_total : filename += "_totals"

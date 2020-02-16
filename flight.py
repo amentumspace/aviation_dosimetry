@@ -3,10 +3,10 @@ import pandas as pd
 from pint import UnitRegistry
 import numpy as np
 import requests
+import os
 
 ureg = UnitRegistry()
 df = pd.read_csv("flight_data.csv")
-
 
 df.columns = [
     "altitude",
@@ -24,15 +24,26 @@ df.columns = [
     "siev",
     "sieverr",
     "epc"
-    ]
+]
 
 for model in ["parma", "cari7"]:
-    url = "http://cosmicrays.amentum.space/" + model + "/ambient_dose"
+    # check env variable to over-ride 
+    url = "http://cosmicrays.amentum.space/" 
+
+    if os.environ.get('URL') is not None:
+         url = os.environ.get('URL')
+
+    url += model 
+    url += "/ambient_dose"
+
+    print(url)
+
     values = []
 
     for index, row in df.iterrows():
         alt = row["altitude"] * ureg.foot
         alt = alt.to(ureg.kilometer).magnitude
+
         lat = row["lat"]
         lon = row["long"]
 
@@ -46,6 +57,8 @@ for model in ["parma", "cari7"]:
             "utc" : 12,
             "particle" : "total"
         }
+
+        # TODO try/except block
         response = requests.get(url, params=parameters) 
 
         dose_rate = response.json() 
@@ -56,9 +69,7 @@ for model in ["parma", "cari7"]:
 
     df[model] = values
 
-
-
-labels = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']
+labels = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6']
 
 x = np.arange(df.shape[0])
 
@@ -73,8 +84,7 @@ rects3 = ax.bar(x + width/2, df["epc"], width, label='EPCARD')
 rects3 = ax.bar(x + width * 1.5, df["cari7"], width, label='CARI-7')
 rects3 = ax.bar(x + width * 2.5, df["parma"], width, label='PARMA')
 
-
-ax.set_ylabel('Ambient dose equivalent, uSv/hr')
+ax.set_ylabel('Ambient Dose Equivalent, uSv/hr')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
