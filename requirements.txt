@@ -1,0 +1,6 @@
+requests==2.22.0
+pandas==0.25.3
+matplotlib==3.1.2
+pytz==2019.3
+numpy==1.17.4
+pint==0.9
